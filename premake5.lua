@@ -25,30 +25,29 @@ project "GLFW"
 		"src/null_platform.h",
 		"src/null_joystick.h",
 		"src/null_init.c",
-	
 		"src/null_monitor.c",
 		"src/null_window.c",
 		"src/null_joystick.c",
-	
 	}
 
 	filter "system:linux"
 		pic "On"
-
 		systemversion "latest"
-		
+
 		files
 		{
 			"src/x11_init.c",
 			"src/x11_monitor.c",
 			"src/x11_window.c",
 			"src/xkb_unicode.c",
+			"src/posix_module.c",
+			"src/posix_poll.c",
 			"src/posix_time.c",
 			"src/posix_thread.c",
 			"src/glx_context.c",
 			"src/egl_context.c",
 			"src/osmesa_context.c",
-			"src/linux_joystick.c"
+			"src/linux_joystick.c",
 		}
 
 		defines
@@ -72,11 +71,11 @@ project "GLFW"
 			"src/win32_window.c",
 			"src/wgl_context.c",
 			"src/egl_context.c",
-			"src/osmesa_context.c"
+			"src/osmesa_context.c",
 		}
 
-		defines 
-		{ 
+		defines
+		{
 			"_GLFW_WIN32",
 			"_CRT_SECURE_NO_WARNINGS"
 		}
