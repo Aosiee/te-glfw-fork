@@ -48,11 +48,16 @@ project "GLFW"
 			"src/egl_context.c",
 			"src/osmesa_context.c",
 			"src/linux_joystick.c",
+			-- Wayland backend
+			"src/wl_init.c",
+			"src/wl_monitor.c",
+			"src/wl_window.c",
 		}
 
 		defines
 		{
-			"_GLFW_X11"
+			"_GLFW_X11",
+			"_GLFW_WAYLAND"
 		}
 
 	filter "system:windows"
