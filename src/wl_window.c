@@ -2028,6 +2028,25 @@ static void dataDeviceHandleMotion(void* userData,
                                    wl_fixed_t x,
                                    wl_fixed_t y)
 {
+    // DRAG_DROP_AND_FILE_PICKER_PLAN.md - upstream GLFW leaves this a no-op,
+    // meaning glfwGetCursorPos()/the cursor-pos callback never reflect
+    // where an external (OS-level) drag is actually hovering - whatever
+    // regular pointer position was last reported before the drag began
+    // just sits stale for the whole drag, which is exactly wrong for
+    // anything (ImGui's own hover tests included) that wants to know
+    // "what's under the drag right now". Mirrors pointerHandleMotion's own
+    // cursor-position update above, just driven by wl_data_device's
+    // motion event instead of wl_pointer's.
+    _GLFWwindow* window = _glfw.wl.dragFocus;
+    if (!window)
+        return;
+
+    const double xpos = wl_fixed_to_double(x);
+    const double ypos = wl_fixed_to_double(y);
+    window->wl.cursorPosX = xpos;
+    window->wl.cursorPosY = ypos;
+
+    _glfwInputCursorPos(window, xpos, ypos);
 }
 
 static void dataDeviceHandleDrop(void* userData,
