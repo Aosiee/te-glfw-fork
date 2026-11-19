@@ -2913,6 +2913,8 @@ static void relativePointerHandleRelativeMotion(void* userData,
     _glfwInputCursorPos(window, xpos, ypos);
 }
 
+static void lockPointer(_GLFWwindow* window);
+
 static const struct zwp_relative_pointer_v1_listener relativePointerListener =
 {
     relativePointerHandleRelativeMotion
@@ -2926,6 +2928,25 @@ static void lockedPointerHandleLocked(void* userData,
 static void lockedPointerHandleUnlocked(void* userData,
                                         struct zwp_locked_pointer_v1* lockedPointer)
 {
+    _GLFWwindow* window = userData;
+
+    // TinyEngine: a compositor may deactivate the lock (a focus change, a
+    // workspace switch) and never reactivate it, leaving a disabled cursor
+    // unlocked. The client still owns the deactivated lock: destroy it (a
+    // second lock on the same surface and pointer would be an
+    // already_constrained protocol error), and the relative pointer with it,
+    // then lock again while the application still wants the cursor disabled.
+    zwp_locked_pointer_v1_destroy(lockedPointer);
+    window->wl.lockedPointer = NULL;
+
+    if (window->wl.relativePointer)
+    {
+        zwp_relative_pointer_v1_destroy(window->wl.relativePointer);
+        window->wl.relativePointer = NULL;
+    }
+
+    if (window->cursorMode == GLFW_CURSOR_DISABLED)
+        lockPointer(window);
 }
 
 static const struct zwp_locked_pointer_v1_listener lockedPointerListener =
